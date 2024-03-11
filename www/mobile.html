@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <!-- the canvas html code was obtained from this https://github.com/0shuvo0/Angle-Brace-Tuts/.
+        I thank them for making it available. it allowed me to quickly begin creating a multiplayer
+        game based on a canvas idea --> 
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Bevan:ital@0;1&display=swap" rel="stylesheet">
+        <title>CanvasGPT</title>
+        <style>
+                *{
+                        margin: 0;
+                        padding: 0;
+                        overflow: hidden;
+                }
+                body.modal-open {
+                        overflow: hidden;
+                        position: fixed;
+                }
+                .bevan-regular {
+                        font-family: "Bevan", serif;
+                        font-weight: 400;
+                        font-style: normal;
+                }
+                .bevan-regular-italic {
+                        font-family: "Bevan", serif;
+                        font-weight: 400;
+                        font-style: italic;
+                }
+
+                .nav{
+                        width: 500px;
+                        height: 50px;
+                        position: fixed;
+                        top: 0;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-around;
+                        opacity: .3;
+                        display: none;
+                        transition: opacity .5s;
+                }
+                .nav:hover{
+                        opacity: 1;
+                }
+
+                .clr{
+                        height: 30px;
+                        width: 30px;
+                        background-color: blue;
+                        border-radius: 90%;
+                        border: 3px solid rgb(214, 214, 214);
+                        transition: transform .5s;
+                }
+                .clr:hover{
+                        transform: scale(1.2);
+                }
+                .clr:nth-child(1){
+                        background-color: #000000;
+                }
+
+                .clr:nth-child(2){
+                        background-color: #572f27;
+                }
+
+                .clr:nth-child(3){
+                        background-color: #ef626c;
+                }
+
+                .clr:nth-child(4){
+                        background-color: #ff9500;
+                }
+
+                .clr:nth-child(5){
+                        background-color: #fdec03;
+                }
+
+                .clr:nth-child(6){
+                        background-color: #24d102;
+                }
+
+                .clr:nth-child(7){
+                        background-color: #108de0;
+                }
+
+                .clr:nth-child(8){
+                        background-color: #7906d6;
+                }
+
+                .clr:nth-child(9){
+                        background-color: #ffffff;
+                }
+
+                button{
+                        border: none;
+                        outline: none;
+                        padding: .6em 1em;
+                        border-radius: 3px;
+                        background-color: #03bb56;
+                        color: #fff;
+                }
+                .new{
+                        background-color: #0fa;
+
+                }
+                .send{
+                        background-color: #0f65d4;
+                }
+                #prompt{
+                        user-select: none;
+                        display: none;
+                        position: fixed;
+                        top: 30vh;
+                        width: 100vw;
+                        font-size: 10vh;
+                        text-align: center;
+                }
+                #score{
+                        user-select: none;
+                        position: fixed;
+                        top: 0vh;
+                        left: 0vw;
+                        font-size: 5vh;
+                        color: black;
+                        width: 25vh;
+                        height: 5vh;
+                        border: 1px solid #111;
+                        border-bottom: 0;
+                        padding-left: 1vh;
+                        padding-right: 1vh;
+                        background-Color: #aaa;
+                }
+                #highscore{
+                        user-selecft: none;
+                        position: fixed;
+                        top: 5vh;
+                        height: 5vh;
+                        width: 25vh;
+                        padding-left: 1vh;
+                        padding-right: 1vh;
+                        color: gold;
+                        background-color: #aaa;
+                        font-size: 5vh;
+                        border: 1px solid #111;
+                        border-top: 0;
+                }
+                #splash{
+                        background-image: url("canvasgpt_drawings.png");
+                        position: absolute;
+                        height: 100vh;
+                        width: 100vw;
+                        background-color: #0fa;
+                        font-size: 7vh;
+                        text-align: center;
+                }
+                #splash_text{
+                        font-family: "Bevan", serif;
+                        font-weight: 400;
+                        font-style: italic;
+                        text-shadow: 4px 4px 5px rgba(0,0,0,0.73);
+                        user-select: none;
+                        position: relative;
+                        top: 30vh;
+                        text-align: center;
+                }
+                #menu{
+                                                user-select: none;
+                        display:none;
+                        position: absolute;
+                        height: 100vh;
+                        width: 100vw;
+                        font-size: 5vh;
+                        text-align: left;
+                }
+                #menu_text{
+                        display:none;
+                        position: relative;
+                        top:40vh;
+                        left: 0;
+                        padding: 0;
+                        margin: 0;
+                        text-align: center;
+                        font-size: 4vh;
+                }
+                #failure{
+                        display:none;
+                        position: absolute;
+                        height: 100vh;
+                        width: 100vw;
+                        background-color: red;
+                        font-size: 8vh;
+                        text-align: left;
+                }
+                #failure_text{
+                        position: relative;
+                        text-align: left;
+                }
+                #success{
+                                                user-select: none;
+                        display:none;
+                        position: absolute;
+                        height: 100vh;
+                        width: 100vw;
+                        background-color: green;
+                        font-size: 10vh;
+                        text-align: center;
+                }
+                #success_text{
+                        position: relative;
+                        top: 30vh;
+                }
+                #loading{
+                        display:none;
+                        position: absolute;
+                        height: 100vh;
+                        width: 100vw;
+                        background-color: grey;
+                        font-size: 10vh;
+                        text-align: center;
+                }
+                #loading_text{
+                        position: relative;
+                        top: 30vh;
+                }
+                #timer{
+                        user-drag: none;
+                        -webkit-user-drag: none;
+                        user-select: none;
+                        -moz-user-select: none;
+                        -webkit-user-select: none;
+                        -ms-user-select: none;
+                        user-select: none;
+                        display: none;
+                        position: absolute;
+                        right: 1vw;
+                        top: -2vh;
+                        width: 24vw;
+                        height: 5vh;
+                        opacity: 0.5;
+                        z-index: 0;
+                }
+                #images{
+                        position:fixed;
+                        background-Color: black;
+                        z-index: 1;
+                        bottom: 0vh;
+                        height: 15vh;
+                        width: 100vw;
+                        float: left;
+                        display: Inline-block;
+                        overflow: hidden;
+
+                }
+                img{
+                        height: 10vh;
+                        padding-top: 2vh;
+                        padding-left: 0.5vh;
+                        padding-bottom: 5vh;
+                        position:relative;
+                        float: left;
+                        filter: grayscale(50%);
+                }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+</head>
+<body>
+        <div id="score">score: 0</div>
+        <div id="highscore">record: 0</div>
+        <div id="images"></div>
+        <img src="timer2.gif" id="timer">
+        <div id="splash"><a id="splash_text">CanvasGPT</a></div>
+        <div id="menu"><a id="menu_text"><br>1 tap -> draw<br>2 tap -> change color</a></div>
+        <div id="failure"><a id="failure_text">High Scores<br><div id="highscores"></div></a></div>
+        <div id="success"><a id="success_text">Success!</a></div>
+        <div id="loading"><a id="loading_text">Loading...</a></div>
+        <canvas id="canvas"></canvas>
+        <div id="prompt"></div>
+
+        <div id="current_color"><div>
+        <div class="nav">
+                <div class="clr" data-clr="#000000"></div>
+                <div class="clr" data-clr="#572f27"></div>
+                <div class="clr" data-clr="#EF626C"></div>
+                <div class="clr" data-clr="#ff9500"></div>
+                <div class="clr" data-clr="#fdec03"></div>
+                <div class="clr" data-clr="#24d102"></div>
+                <div class="clr" data-clr="#108de0"></div>
+                <div class="clr" data-clr="#7906d6"></div>
+                <div class="clr" data-clr="#ffffff"></div>
+                <button class="new">new</button>
+                <button class="clear">clear</button>
+                <button class="send">send</button>
+        </div>
+        <script>
+                $( document ).ready(function() {
+                        console.log( "ready!" );
+                        $.ajaxSetup({
+                                cache: false,
+                        });
+                        $('html, body').css({
+                                overflow: 'hidden',
+                                height: '100%'
+                        });
+                        blank = true;
+                        var overnav = false;
+                        $("#images").hide();
+                        $("#images").delay(1000).slideDown(1000); //fadeIn(1000);
+                        $("#timer").hide();
+                        $("#prompt").delay(2000).fadeIn(500);
+                        $("#prompt").delay(5500).fadeOut(1000);
+                        $("#menu").delay(100).fadeIn(100);
+                        $("#menu_text").delay(100).fadeIn(100);
+                        $("#splash").delay(500).fadeOut(2000);
+                        $("#menu").delay(1000).fadeOut(2000);
+                        $("#menu_text").delay(1000).fadeOut(2000);
+                <!-- added backend processing -->
+                const canvas_colors = ["#000000", "#572f27", "#EF626C", "#ff9500", "#fdec03", "#24d102", "#108de0", "#7906d6", "#ffffff"];
+                var canvas_colors_pos = 1;
+
+
+                let socket = io.connect('https://127.0.0.1:6969/canvas');
+                let canvas = document.getElementById("canvas")
+                canvas.height = window.innerHeight
+                canvas.width = window.innerWidth
+                let ctx = canvas.getContext("2d")
+                ctx.lineWidth = 5
+
+                let prevX = null
+                let prevY = null
+                var submitted = 0;
+                function reset() {
+                        $("#canvas").fadeIn(1000);
+                        //clear canvas
+                        ctx.clearRect(0, 0, canvas.width, canvas.height)
+                        ctx.fillStyle = "#FFFFFF"
+                        ctx.fillRect(0,0,canvas.width, canvas.height)
+                        //update images
+                        updateimages();
+                        $("#loading").hide();
+                        $("#success").fadeOut(1000);
+                        $("#images").hide();
+                        $("#images").delay(1000).fadeIn(1000);
+                        $(".nav").fadeIn(1000);
+                        $("#prompt").delay(1000).fadeIn(1000);
+                        $("#prompt").delay(2500).fadeOut(1000);
+                        $("#timer").hide();
+                        start_timer();
+                        submitted = 0;
+                }
+
+                let draw = false
+
+                let clrs = document.querySelectorAll(".clr")
+                clrs = Array.from(clrs)
+                clrs.forEach(clr => {
+                        clr.addEventListener("click", () => {
+                                ctx.strokeStyle = clr.dataset.clr
+                        })
+                })
+
+                //added code to make background white
+                ctx.fillStyle = "#FFFFFF"
+                ctx.fillRect(0,0,canvas.width, canvas.height)
+
+
+                let newBtn = document.querySelector(".new")
+                newBtn.addEventListener("click", () => {
+                        location.reload()
+                })
+
+
+                let clearBtn = document.querySelector(".clear")
+                clearBtn.addEventListener("click", () => {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height)
+                        ctx.fillStyle = "#FFFFFF"
+                        ctx.fillRect(0,0,canvas.width, canvas.height)
+                })
+
+                let sendBtn = document.querySelector(".send")
+                sendBtn.addEventListener("click", () => {
+                })
+
+                //adding touch support for mobile
+                window.addEventListener("touchstart", (e) => {
+                        if(e.touches.length == 2) {
+                                if(canvas_colors_pos <= 8){
+                                        //set color
+                                        ctx.strokeStyle = canvas_colors[canvas_colors_pos]
+                                        document.getElementById("images").style.backgroundColor = canvas_colors[canvas_colors_pos]
+                                        canvas_colors_pos++
+                                }
+                                else{
+                                        canvas_colors_pos = 0
+                                        ctx.strokeStyle = canvas_colors[canvas_colors_pos]
+                                }
+                        }
+                        else if(e.touches.length == 3) {
+                                //send
+                                if(submitted < 1){
+                                        //$("#images").fadeOut(1000)
+                                        //$("#canvas").fadeOut(2000)
+                                        //$(".nav").fadeOut(1000);
+                                        //$("#loading").fadeIn(1000)
+                                        //let data = canvas.toDataURL("image/jpeg", 1.0)
+                                        //const base64data = data
+                                        //socket.emit('upload_photo', base64data);
+                                        //submitted++;
+                                }
+                        }
+                        else{
+                        }
+                        draw = true
+                        e.preventDefault()
+                },false,
+                )
+                window.addEventListener("touchmove", (e) => {
+                        if(overnav == true){
+                                draw = false;
+                        }
+                        if(prevX == null || prevY == null || !draw){
+                                prevX = e.touches[0].clientX;
+                                prevY = e.touches[0].clientY;
+                                return
+                        }
+                        if(draw){
+                                let deltaX;
+                                let deltaY;
+                                deltaX = e.touches[0].clientX;
+                                deltaY = e.touches[0].clientY;
+                                ctx.beginPath()
+                                ctx.moveTo(prevX, prevY)
+                                ctx.lineTo(deltaX, deltaY)
+                                ctx.stroke()
+                                prevX = e.touches[0].clientX
+                                prevY = e.touches[0].clientY
+                                blank = false;
+                        }
+                },false,
+                )
+                document.body.addEventListener("touchend", (e) => {
+                        draw = false
+                        prevX = null;
+                        prevY = null;
+                        deltaX = null;
+                        deltaY = null;
+                        e.preventDefault()
+                },false,
+                )
+                socket.on('highscore', function(data){
+                        $("#highscore").html("record: " + data.data);
+                        console.log("highscore: ", data.data)
+                });
+                socket.on('reply', function(data) {
+                        console.log("Received reply: ", data.data)
+                })
+                socket.on('score', function(data){
+                        $("#score").html("score: " + data.data);
+                        console.log("score: ", data.data)
+                });
+                socket.on('prompt', function(data) {
+                        console.log("Received prompt: ", data.data)
+                        if(data.data.includes("Success")){
+                                $("#loading").fadeOut(500);
+                                $("#success").show();
+                                reset();
+
+                        }
+                        else if(data.data.includes("Failure")){
+                                $("#loading").fadeOut(500);
+                                $("#failure").show();
+                                $("#images").slideUp(1000);
+                                //setTimeout(function (){
+                                //        location.reload();
+                                //}, 2000);
+                                updatehighscores();
+                                $("#highscores").show();
+                        }
+                        else{
+                                $("#prompt").html(data.data);
+
+                        }
+                })
+                function updatehighscores() {
+                    $.getJSON( "https://127.0.0.1/scores.json", function( data ) {
+                        var items = [];
+                        let last = 0;
+                        $.each( data.reverse(), function( key, value ) {
+                            if(value.name != last){
+                                console.log(value.name + ": " + value.score);
+                                    items.push( "<p>" + value.name + ": " + value.score + "</p>");
+                                    last = value.name;
+                            }
+                        });
+                                $( "<ul/>", {
+                                        "class": "my-new-list",
+                                        html: items.join( "" )
+                                }).appendTo( "#highscores" );
+                        });
+                }
+                var old = 0;
+                function updateimages() {
+                        $.get( "https://127.0.0.1/queue.txt", function( data ) {
+                                var lines = data.split("\n").slice(-18).reverse();
+                                let file = "https://127.0.0.1/queue.txt";
+                                if (data != old){
+                                        for (var i = 0, len = lines.length; i < len; i++) {
+                                                if(i <1){
+                                                        $("#images").html("<img src=" + lines[i] +">");
+                                                }
+                                                else{
+                                                        $("#images").append("<img src=" + lines[i] +">");
+                                                }
+                                        }
+                                }
+                                old = data;
+                        });
+                }
+                updateimages();
+                setInterval(function(){
+                        updateimages();
+                }, 1000);
+
+                function start_timer(){
+                        setTimeout(function(){
+                                $("#timer").hide();
+                                $(".nav").fadeOut(1000);
+                                $("#canvas").fadeOut(1000);
+                                if(!blank){
+                                        let data = canvas.toDataURL("image/jpeg", 1.0)
+                                        <!-- send image -->
+                                        console.log("image sent to server")
+                                        const base64data = data
+                                        socket.emit('upload_photo', base64data);
+                                        submitted++;
+                                        $("#loading").fadeIn(1000);
+                                        blank = true;
+                                }
+                                else{
+                                        alert("canvas is blank!");
+                                        location.reload();
+                                }
+                        }, 22000);
+                        setTimeout(function(){
+                                let x = Math.random() * 1000;
+                                jQuery("#timer").attr('src', "");
+                                jQuery("#timer").attr('src', "timer.gif?random=" + x);
+                                jQuery("#timer").show();
+                        }, 10000);
+                };
+                start_timer();
+
+                });
+        </script>
+</body>
+</html>
