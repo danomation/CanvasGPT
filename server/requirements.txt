@@ -1,0 +1,17 @@
+openai
+dotenv
+secrets
+ssl
+requests
+json
+asyncio
+operator
+random
+re
+threading
+queue
+base64
+flask
+flask_socketio
+cv2
+numpy
